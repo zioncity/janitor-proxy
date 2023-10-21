@@ -6,6 +6,7 @@ const app = express();
 
 // Enable CORS
 app.use(cors());
+app.get("/health", (_req, res) => res.sendStatus(200));
 
 // Define the proxy middleware
 const proxy = createProxyMiddleware("/bot-avatars", {
