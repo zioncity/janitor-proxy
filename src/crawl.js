@@ -9,7 +9,7 @@ async function getChromiumPage() {
     }
 
     const browser = await chromium.launch({
-        headless: true,
+        headless: false,
     });
     const context = await browser.newContext();
     const page = await context.newPage();
