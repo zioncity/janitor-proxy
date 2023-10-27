@@ -1,0 +1,9 @@
+{
+    "apps": [
+      {
+        "name": "img-proxy",
+        "script": "src/index.js"
+      }
+    ]
+  }
+  
