@@ -1,6 +1,8 @@
 const express = require("express");
-const { createProxyMiddleware } = require("http-proxy-middleware");
 const cors = require("cors");
+
+const {getImageBase64 } = require('./crawl');
+
 
 const app = express();
 
@@ -8,57 +10,38 @@ const app = express();
 app.use(cors());
 app.get("/health", (_req, res) => res.sendStatus(200));
 
-// Define the proxy middleware
-const botAvatarProxy = createProxyMiddleware("/bot-avatars", {
-  target: "https://pics.janitorai.com",
-  changeOrigin: true,
-  pathRewrite: {
-    "^/bot-avatars": "/bot-avatars",
-  },
-  onProxyReq(proxyReq, req, res) {
-    proxyReq.setHeader(
-      "User-Agent",
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
-    );
-    proxyReq.setHeader(
-      "sec-ch-ua",
-      `"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"`
-    );
-    proxyReq.setHeader("Referer", "https://www.janitorai.com");
-  },
-});
-
-const avatarProxy = createProxyMiddleware("/avatars", {
-  target: "https://pics.janitorai.com",
-  changeOrigin: true,
-  pathRewrite: {
-    "^/avatars": "/avatars",
-  },
-  onProxyReq(proxyReq, req, res) {
-    proxyReq.setHeader(
-      "User-Agent",
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
-    );
-    proxyReq.setHeader(
-      "sec-ch-ua",
-      `"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"`
-    );
-    proxyReq.setHeader("Referer", "https://www.janitorai.com");
-  },
-});
-
-// Use the proxy middleware
-app.use("/bot-avatars", botAvatarProxy);
-app.use("/avatars", avatarProxy);
-
 // Set Expires header for caching (adjust as needed)
-app.use("/bot-avatars", (req, res, next) => {
+// app.use("/bot-avatars", (req, res, next) => {
+//   res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
+//   next();
+// });
+// app.use("/avatars", (req, res, next) => {
+//   res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
+//   next();
+// });
+
+app.get("/bot-avatars/:fileName", async (req, res, next) => {
   res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
-  next();
-});
-app.use("/avatars", (req, res, next) => {
-  res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
-  next();
+
+  const fileName = req.params.fileName;
+  const imageData = await getImageBase64(fileName);
+
+  // Extract the file extension from the URL
+  const extname = fileName.split(".").pop();
+  const contentType =
+    {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      webp: "image/webp",
+      avif: "image/avif",
+      tiff: "image/tiff",
+    }[extname] || "application/octet-stream";
+
+  // Set the response content type based on the file extension
+  res.setHeader("Content-Type", contentType);
+  // Send the image data as the response
+  res.send(Buffer.from(imageData, "base64"));
 });
 
 // Start the Express app
