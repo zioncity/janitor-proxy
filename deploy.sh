@@ -1,6 +1,6 @@
 #!/bin/bash
-git reset --hard origin/master
-git pull origin master
+git reset --hard origin/main
+git pull origin main
 
 rm -rf node_modules
 rm -rf dist
