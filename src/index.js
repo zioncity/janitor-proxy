@@ -1,30 +1,17 @@
 const express = require("express");
 const cors = require("cors");
-
 const {getImageBase64 } = require('./crawl');
-
-
 const app = express();
 
 // Enable CORS
 app.use(cors());
 app.get("/health", (_req, res) => res.sendStatus(200));
 
-// Set Expires header for caching (adjust as needed)
-// app.use("/bot-avatars", (req, res, next) => {
-//   res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
-//   next();
-// });
-// app.use("/avatars", (req, res, next) => {
-//   res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
-//   next();
-// });
-
-app.get("/bot-avatars/:fileName", async (req, res, next) => {
+app.get("/proxy/:folder/:fileName", async (req, res, next) => {
   res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
 
-  const fileName = req.params.fileName;
-  const imageData = await getImageBase64(fileName);
+  const {folder, fileName} = req.params; // folder can be bot-avatars or avatars
+  const imageData = await getImageBase64(folder,fileName);
 
   // Extract the file extension from the URL
   const extname = fileName.split(".").pop();

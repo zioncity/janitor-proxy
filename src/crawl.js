@@ -18,10 +18,10 @@ async function getChromiumPage() {
     return page;
 }
 
-async function getImageBase64(fileName) {
+async function getImageBase64(folder, fileName) {
     const page = await getChromiumPage();
 
-    await page.goto(`https://pics.janitorai.com/bot-avatars/${fileName}`);
+    await page.goto(`https://pics.janitorai.com/${folder}/${fileName}`);
     const image = page.locator("img").nth(0);
     const imageData = await image.evaluate((element) => {
         var cnv = document.createElement("canvas");
