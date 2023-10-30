@@ -8,19 +8,23 @@ app.use(cors());
 app.get("/health", (_req, res) => res.sendStatus(200));
 
 app.get("/proxy/:folder/:fileName", async (req, res, next) => {
-  res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
+  try {
+    const { folder, fileName } = req.params; // folder can be bot-avatars or avatars
+    console.log({ folder, fileName })
 
-  const { folder, fileName } = req.params; // folder can be bot-avatars or avatars
-  console.log({ folder, fileName })
+    const imageData = await getImageBase64(folder, fileName);
+    const contentType = getImgType(fileName);
+    // Set the response content type based on the file extension
+    res.header("Cache-Control", "public, max-age=604800"); // 7 days in seconds
+    res.setHeader("Content-Type", contentType);
 
-  const imageData = await getImageBase64(folder, fileName);
-  const contentType = getImgType(fileName);
-  // Set the response content type based on the file extension
-  res.setHeader("Content-Type", contentType);
-
-  console.log('Content-Type', contentType);
-  // Send the image data as the response
-  res.send(Buffer.from(imageData, "base64"));
+    console.log('Content-Type', contentType);
+    // Send the image data as the response
+    res.send(Buffer.from(imageData, "base64"));
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(404);
+  }
 });
 
 // Start the Express app

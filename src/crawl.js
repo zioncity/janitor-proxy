@@ -37,6 +37,7 @@ async function getImageBase64(folder, fileName) {
 
     await page.goto(`https://pics.janitorai.com/${folder}/${fileName}`, { waitUntil: 'domcontentloaded' });
     const image = page.locator("img").nth(0);
+
     const imageData = await image.evaluate((element, imgType) => {
         var cnv = document.createElement("canvas");
         cnv.width = element.naturalWidth;
@@ -45,7 +46,7 @@ async function getImageBase64(folder, fileName) {
             .getContext("2d")
             .drawImage(element, 0, 0, element.naturalWidth, element.naturalHeight);
         return cnv.toDataURL(imgType, 0.8).substring(22);
-    }, imgType);
+    }, imgType, { timeout: 5_000 });
     page.close();
     return imageData;
 }
