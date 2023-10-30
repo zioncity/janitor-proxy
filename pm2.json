@@ -5,7 +5,8 @@
             "script": "src/index.js",
             "env": {
                 "DISPLAY": ":99"
-            }
+            },
+            "log_date_format": "YYYY-MM-DD HH:mm:ss"
         },
         {
             "name": "Xvfb",
