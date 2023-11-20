@@ -11,8 +11,21 @@ async function getChromiumPage() {
         chromiumContext = await browser.newContext();
     }
 
-    const page = await chromiumContext.newPage();
-    return page;
+    try {
+        const page = await chromiumContext.newPage();
+        return page;
+    } catch(err) {
+        // Try again by creating a new context, maybe the page/content is closed
+        // browserContext.newPage: Target page, context or browser has been closed
+
+        console.error(err);
+        const browser = await chromium.launch({
+            headless: true,
+        });
+        chromiumContext = await browser.newContext();
+        const page = await chromiumContext.newPage();
+        return page;
+    }
 }
 
 function getImgType(fileName) {
