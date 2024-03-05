@@ -6,6 +6,7 @@
             "env": {
                 "DISPLAY": ":99"
             },
+            "cron_restart": "0 */6 * * *",
             "log_date_format": "YYYY-MM-DD HH:mm:ss"
         },
         {
