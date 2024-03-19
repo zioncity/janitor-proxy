@@ -4,7 +4,8 @@
             "name": "img-proxy",
             "script": "src/index.js",
             "env": {
-                "DISPLAY": ":99"
+                "DISPLAY": ":99",
+                "NODE_ENV": "production"
             },
             "log_date_format": "YYYY-MM-DD HH:mm:ss"
         },

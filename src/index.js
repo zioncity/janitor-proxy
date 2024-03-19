@@ -1,10 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const { getImageBase64, getImgType } = require('./crawl');
+const { getImageBase64, getImgType, getCharacters, getCharacter } = require('./crawl');
 const app = express();
 
 // Enable CORS
 app.use(cors());
+app.get("/", (_req, res) => res.json({ status: 'ok' }));
 app.get("/health", (_req, res) => res.sendStatus(200));
 
 app.get("/proxy/:folder/:fileName", async (req, res, next) => {
@@ -26,6 +27,29 @@ app.get("/proxy/:folder/:fileName", async (req, res, next) => {
     res.sendStatus(404);
   }
 });
+
+app.get("/characters", async (req, res, next) => {
+  try {
+    const result = await getCharacters(req.query.page)
+    console.log(result);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(404);
+  }
+});
+
+app.get("/characters/:id", async (req, res, next) => {
+  try {
+    const result = await getCharacter(req.params.id)
+    console.log(result);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(404);
+  }
+});
+
 
 // Start the Express app
 const port = process.env.PORT || 3000; // Change this to the desired port

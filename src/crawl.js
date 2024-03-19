@@ -2,11 +2,16 @@ const { chromium } = require("playwright-extra");
 const stealth = require("puppeteer-extra-plugin-stealth")();
 chromium.use(stealth);
 
+// True when test in Github, when run for in VPS should be false
+const headless = process.env.NODE_ENV !== 'production'
+
+console.log(`Running in env ${process.env.NODE_ENV} with headless: ${headless}`)
+
 let chromiumContext = undefined;
 async function getChromiumPage() {
     if (!chromiumContext) {
         const browser = await chromium.launch({
-            headless: false,
+            headless,
         });
         chromiumContext = await browser.newContext();
     }
@@ -14,13 +19,13 @@ async function getChromiumPage() {
     try {
         const page = await chromiumContext.newPage();
         return page;
-    } catch(err) {
+    } catch (err) {
         // Try again by creating a new context, maybe the page/content is closed
         // browserContext.newPage: Target page, context or browser has been closed
 
         console.error(err);
         const browser = await chromium.launch({
-            headless: true,
+            headless,
         });
         chromiumContext = await browser.newContext();
         const page = await chromiumContext.newPage();
@@ -64,7 +69,57 @@ async function getImageBase64(folder, fileName) {
     return imageData;
 }
 
+async function getCharacters(pageNumber) {
+    console.log("Getting characters from page " + pageNumber);
+    const page = await getChromiumPage();
+    await page.goto(`https://kim.janitorai.com/characters?page=${pageNumber}&mode=all&sort=latest`, { waitUntil: 'domcontentloaded' });
+
+    try {
+        const htmlString = await page.content();
+        const matches = htmlString.match(/\{.*\}/s);
+        if (matches) {
+            const jsonString = matches[0];
+            const result = JSON.parse(jsonString);
+            if (result.data) {
+                return result;
+            } else {
+                console.error(htmlString);
+            }
+        } else {
+            console.error(htmlString);
+        }
+    } finally {
+        page.close();
+    }
+}
+
+async function getCharacter(id) {
+    console.log("Getting character by id " + id);
+    const page = await getChromiumPage();
+    await page.goto(`https://kim.janitorai.com/characters/${id}`, { waitUntil: 'domcontentloaded' });
+
+    try {
+        const htmlString = await page.content();
+        const matches = htmlString.match(/\{.*\}/s);
+        if (matches) {
+            const jsonString = matches[0];
+            const result = JSON.parse(jsonString);
+            if (result.id) {
+                return result;
+            } else {
+                console.error(htmlString);
+            }
+        } else {
+            console.error(htmlString);
+        }
+    } finally {
+        page.close();
+    }
+}
+
 module.exports = {
     getImageBase64,
-    getImgType
+    getImgType,
+    getCharacters,
+    getCharacter
 }
