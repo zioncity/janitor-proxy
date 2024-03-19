@@ -31,7 +31,6 @@ app.get("/proxy/:folder/:fileName", async (req, res, next) => {
 app.get("/characters", async (req, res, next) => {
   try {
     const result = await getCharacters(req.query.page)
-    console.log(result);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -42,7 +41,6 @@ app.get("/characters", async (req, res, next) => {
 app.get("/characters/:id", async (req, res, next) => {
   try {
     const result = await getCharacter(req.params.id)
-    console.log(result);
     res.json(result);
   } catch (err) {
     console.error(err);
