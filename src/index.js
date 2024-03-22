@@ -38,16 +38,6 @@ app.get("/characters", async (req, res, next) => {
   }
 });
 
-app.get("/characters/:id", async (req, res, next) => {
-  try {
-    const result = await getCharacter(req.params.id)
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(404);
-  }
-});
-
 app.get("/v2/characters/:id", async (req, res, next) => {
   try {
     const token = req.query.token;

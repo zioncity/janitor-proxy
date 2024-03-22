@@ -107,31 +107,6 @@ async function getCharacters(pageNumber) {
     }
 }
 
-
-async function getCharacter(id) {
-    console.log("Getting character by id " + id);
-    const page = await getChromiumPage();
-    await page.goto(`https://kim.janitorai.com/characters/${id}`, { waitUntil: 'domcontentloaded' });
-
-    try {
-        const htmlString = await page.content();
-        const matches = htmlString.match(/\{.*\}/s);
-        if (matches) {
-            const jsonString = matches[0];
-            const result = JSON.parse(jsonString);
-            if (result.id) {
-                return result;
-            } else {
-                console.error(htmlString);
-            }
-        } else {
-            console.error(htmlString);
-        }
-    } finally {
-        page.close();
-    }
-}
-
 async function getCharacterV2(token, id) {
     console.log("Getting character by id v2 " + id);
     const page = await getJanitorPage();
@@ -172,6 +147,5 @@ module.exports = {
     getImageBase64,
     getImgType,
     getCharacters,
-    getCharacter,
     getCharacterV2
 }
