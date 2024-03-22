@@ -8,6 +8,8 @@ const headless = process.env.NODE_ENV !== 'production'
 console.log(`Running in env ${process.env.NODE_ENV} with headless: ${headless}`)
 
 let chromiumContext = undefined;
+let janitorPage = undefined;
+
 async function getChromiumPage() {
     if (!chromiumContext) {
         const browser = await chromium.launch({
@@ -31,6 +33,18 @@ async function getChromiumPage() {
         const page = await chromiumContext.newPage();
         return page;
     }
+}
+
+async function getJanitorPage() {
+    if (janitorPage) {
+        return janitorPage;
+    }
+
+    const page = await getChromiumPage();
+    await page.goto(`https://janitorai.com`, { waitUntil: 'domcontentloaded' });
+    janitorPage = page;
+
+    return janitorPage;
 }
 
 function getImgType(fileName) {
@@ -93,6 +107,7 @@ async function getCharacters(pageNumber) {
     }
 }
 
+
 async function getCharacter(id) {
     console.log("Getting character by id " + id);
     const page = await getChromiumPage();
@@ -117,9 +132,46 @@ async function getCharacter(id) {
     }
 }
 
+async function getCharacterV2(token, id) {
+    console.log("Getting character by id v2 " + id);
+    const page = await getJanitorPage();
+
+    const rs = await page.evaluate(async ({ characterId, token }) => {
+        const result = await fetch(`https://kim.janitorai.com/characters/${characterId}`, {
+            "headers": {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "en-GB,en;q=0.9",
+                "authorization": `Bearer ${token}`,
+                "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"macOS\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site",
+                "x-app-version": "2024-03-22.644ecae"
+            },
+            "referrerPolicy": "same-origin",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
+            "credentials": "include"
+        });
+
+        const json = await result.json();
+        return json;
+    }, {
+        characterId: id,
+        token: token
+    })
+
+    // Do not close page, lol
+    return rs;
+}
+
 module.exports = {
     getImageBase64,
     getImgType,
     getCharacters,
-    getCharacter
+    getCharacter,
+    getCharacterV2
 }

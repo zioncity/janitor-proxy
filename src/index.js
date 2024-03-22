@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { getImageBase64, getImgType, getCharacters, getCharacter } = require('./crawl');
+const { getImageBase64, getImgType, getCharacters, getCharacter, getCharacterV2 } = require('./crawl');
 const app = express();
 
 // Enable CORS
@@ -41,6 +41,17 @@ app.get("/characters", async (req, res, next) => {
 app.get("/characters/:id", async (req, res, next) => {
   try {
     const result = await getCharacter(req.params.id)
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(404);
+  }
+});
+
+app.get("/v2/characters/:id", async (req, res, next) => {
+  try {
+    const token = req.query.token;
+    const result = await getCharacterV2(token, req.params.id)
     res.json(result);
   } catch (err) {
     console.error(err);
