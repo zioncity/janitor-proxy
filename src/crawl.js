@@ -78,7 +78,7 @@ async function getImageBase64(folder, fileName) {
             .getContext("2d")
             .drawImage(element, 0, 0, element.naturalWidth, element.naturalHeight);
         return cnv.toDataURL(imgType, 0.8).substring(22);
-    }, imgType, { timeout: 5_000 });
+    }, imgType, { timeout: 3_000 });
     page.close();
     return imageData;
 }
@@ -95,6 +95,7 @@ async function getCharacters(pageNumber) {
             const jsonString = matches[0];
             const result = JSON.parse(jsonString);
             if (result.data) {
+                console.log(result.data);
                 return result;
             } else {
                 console.error(htmlString);
