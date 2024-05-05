@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { getImageBase64, getImgType, getCharacters, getCharacter, getCharacterV2 } = require('./crawl');
+const { getImageBase64, getImgType, getCharacters, getPopularCharacters, getCharacterV2 } = require('./crawl');
 const app = express();
 
 // Enable CORS
@@ -49,6 +49,15 @@ app.get("/v2/characters/:id", async (req, res, next) => {
   }
 });
 
+app.get("/popular/characters", async (req, res, next) => {
+  try {
+    const result = await getPopularCharacters(req.query.page)
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(404);
+  }
+});
 
 // Start the Express app
 const port = process.env.PORT || 3000; // Change this to the desired port
