@@ -88,7 +88,7 @@ async function getCharacters(pageNumber) {
     const page = await getJanitorPage();
 
     const rs = await page.evaluate(async ({ page }) => {
-        const result = await fetch(`https://kim.janitorai.com/characters?page=${page}&mode=all&sort=latest`, {
+        const result = await fetch(`https://janitorai.com/hampter/characters?page=${page}&mode=all&sort=latest`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
@@ -122,7 +122,7 @@ async function getPopularCharacters(pageNumber) {
     const page = await getJanitorPage();
 
     const rs = await page.evaluate(async ({ page }) => {
-        const result = await fetch(`https://kim.janitorai.com/characters?page=${page}&mode=all&sort=popular`, {
+        const result = await fetch(`https://janitorai.com/hampter/characters?page=${page}&mode=all&sort=popular`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
@@ -156,7 +156,7 @@ async function getCharacterV2(token, id) {
     const page = await getJanitorPage();
 
     const rs = await page.evaluate(async ({ characterId, token }) => {
-        const result = await fetch(`https://kim.janitorai.com/characters/${characterId}`, {
+        const result = await fetch(`https://janitorai.com/hampter/characters/${characterId}`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
