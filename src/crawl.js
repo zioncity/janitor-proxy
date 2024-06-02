@@ -67,7 +67,7 @@ async function getImageBase64(folder, fileName) {
     const page = await getChromiumPage();
     const imgType = getImgType(fileName);
 
-    await page.goto(`https://ella.janitorai.com/${folder}/${fileName}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`https://ella.janitorai.com/${folder}/${fileName}?width=1000`, { waitUntil: 'domcontentloaded' });
     const image = page.locator("img").nth(0);
 
     const imageData = await image.evaluate((element, imgType) => {
