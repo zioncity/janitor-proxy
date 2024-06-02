@@ -187,10 +187,45 @@ async function getCharacterV2(token, id) {
     return rs;
 }
 
+async function getCreatorProfile(id) {
+    console.log("Getting creator by id v2 " + id);
+    const page = await getJanitorPage();
+
+    const rs = await page.evaluate(async ({ profileId }) => {
+        const result = await fetch(`https://janitorai.com/hampter/profiles/${profileId}`, {
+            "headers": {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "en-GB,en;q=0.9",
+                "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"macOS\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-site",
+                "x-app-version": "2024-03-22.644ecae"
+            },
+            "referrerPolicy": "same-origin",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
+            "credentials": "include"
+        });
+
+        const json = await result.json();
+        return json;
+    }, {
+        profileId: id,
+    })
+
+    // Do not close page, lol
+    return rs;
+}
+
 module.exports = {
     getImageBase64,
     getImgType,
     getCharacters,
     getPopularCharacters,
-    getCharacterV2
+    getCharacterV2,
+    getCreatorProfile
 }
