@@ -14,7 +14,8 @@
             "name": "Xvfb",
             "interpreter": "none",
             "script": "Xvfb",
-            "args": ":99"
+            "args": ":99",
+            "cron_restart": "0 */2 * * *"
         }
     ]
 }
