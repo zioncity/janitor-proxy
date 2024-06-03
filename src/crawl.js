@@ -7,6 +7,14 @@ const headless = process.env.NODE_ENV !== 'production'
 
 console.log(`Running in env ${process.env.NODE_ENV} with headless: ${headless}`)
 
+const APP_VERSION_HEADER = 'x-app-version'
+const JANITOR_APP_VERSION = '2024-06-01.c592b195'
+
+const headers = {
+    APP_VERSION_HEADER,
+    JANITOR_APP_VERSION
+}
+
 let chromiumContext = undefined;
 let janitorPage = undefined;
 
@@ -87,18 +95,17 @@ async function getCharacters(pageNumber) {
     console.log("Getting characters from page " + pageNumber);
     const page = await getJanitorPage();
 
-    const rs = await page.evaluate(async ({ page }) => {
+    const rs = await page.evaluate(async ({ page, headers: {APP_VERSION_HEADER, JANITOR_APP_VERSION} }) => {
         const result = await fetch(`https://janitorai.com/hampter/characters?page=${page}&mode=all&sort=latest`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
-                "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"macOS\"",
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
-                "x-app-version": "2024-03-22.644ecae"
+                [APP_VERSION_HEADER]: JANITOR_APP_VERSION
             },
             "referrerPolicy": "same-origin",
             "body": null,
@@ -110,7 +117,8 @@ async function getCharacters(pageNumber) {
         const json = await result.json();
         return json;
     }, {
-        page: pageNumber
+        page: pageNumber,
+        headers
     })
 
     // Do not close page, lol
@@ -121,18 +129,17 @@ async function getPopularCharacters(pageNumber) {
     console.log("Getting characters from page " + pageNumber);
     const page = await getJanitorPage();
 
-    const rs = await page.evaluate(async ({ page }) => {
+    const rs = await page.evaluate(async ({ page, headers: {APP_VERSION_HEADER, JANITOR_APP_VERSION} }) => {
         const result = await fetch(`https://janitorai.com/hampter/characters?page=${page}&mode=all&sort=popular`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
-                "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"macOS\"",
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
-                "x-app-version": "2024-03-22.644ecae"
+                [APP_VERSION_HEADER]: JANITOR_APP_VERSION
             },
             "referrerPolicy": "same-origin",
             "body": null,
@@ -144,30 +151,30 @@ async function getPopularCharacters(pageNumber) {
         const json = await result.json();
         return json;
     }, {
-        page: pageNumber
+        page: pageNumber,
+        headers
     })
 
     // Do not close page, lol
     return rs;
 }
 
-async function getCharacterV2(token, id) {
+async function getCharacter(token, id) {
     console.log("Getting character by id v2 " + id);
     const page = await getJanitorPage();
 
-    const rs = await page.evaluate(async ({ characterId, token }) => {
+    const rs = await page.evaluate(async ({ characterId, token, headers: {APP_VERSION_HEADER, JANITOR_APP_VERSION} }) => {
         const result = await fetch(`https://janitorai.com/hampter/characters/${characterId}`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
                 "authorization": `Bearer ${token}`,
-                "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"macOS\"",
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
-                "x-app-version": "2024-03-22.644ecae"
+                [APP_VERSION_HEADER]: JANITOR_APP_VERSION
             },
             "referrerPolicy": "same-origin",
             "body": null,
@@ -180,7 +187,8 @@ async function getCharacterV2(token, id) {
         return json;
     }, {
         characterId: id,
-        token: token
+        token: token,
+        headers
     })
 
     // Do not close page, lol
@@ -191,18 +199,17 @@ async function getCreatorProfile(id) {
     console.log("Getting creator by id v2 " + id);
     const page = await getJanitorPage();
 
-    const rs = await page.evaluate(async ({ profileId }) => {
+    const rs = await page.evaluate(async ({ profileId, headers: {APP_VERSION_HEADER, JANITOR_APP_VERSION} }) => {
         const result = await fetch(`https://janitorai.com/hampter/profiles/${profileId}`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en-GB,en;q=0.9",
-                "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Google Chrome\";v=\"122\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"macOS\"",
                 "sec-fetch-dest": "empty",
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-site",
-                "x-app-version": "2024-03-22.644ecae"
+                [APP_VERSION_HEADER]: JANITOR_APP_VERSION
             },
             "referrerPolicy": "same-origin",
             "body": null,
@@ -215,6 +222,7 @@ async function getCreatorProfile(id) {
         return json;
     }, {
         profileId: id,
+        headers
     })
 
     // Do not close page, lol
@@ -226,6 +234,6 @@ module.exports = {
     getImgType,
     getCharacters,
     getPopularCharacters,
-    getCharacterV2,
+    getCharacter,
     getCreatorProfile
 }
