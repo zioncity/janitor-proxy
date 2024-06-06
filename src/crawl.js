@@ -8,7 +8,7 @@ const headless = process.env.NODE_ENV !== 'production'
 console.log(`Running in env ${process.env.NODE_ENV} with headless: ${headless}`)
 
 const APP_VERSION_HEADER = 'x-app-version'
-const JANITOR_APP_VERSION = '2024-06-01.c592b195'
+const JANITOR_APP_VERSION = '2024-06-05.02be0c9fa'
 
 const headers = {
     APP_VERSION_HEADER,
