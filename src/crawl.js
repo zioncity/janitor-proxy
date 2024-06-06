@@ -1,4 +1,5 @@
 const { chromium } = require("playwright-extra");
+const { exec } = require('child_process');
 const stealth = require("puppeteer-extra-plugin-stealth")();
 chromium.use(stealth);
 
@@ -8,7 +9,7 @@ const headless = process.env.NODE_ENV !== 'production'
 console.log(`Running in env ${process.env.NODE_ENV} with headless: ${headless}`)
 
 const APP_VERSION_HEADER = 'x-app-version'
-const JANITOR_APP_VERSION = '2024-06-05.02be0c9fa'
+const JANITOR_APP_VERSION = '2024-06-05.02be0c9f'
 
 const headers = {
     APP_VERSION_HEADER,
@@ -17,10 +18,11 @@ const headers = {
 
 let chromiumContext = undefined;
 let janitorPage = undefined;
+let browser = undefined
 
-async function getChromiumPage() {
+async function newChromiumPage() {
     if (!chromiumContext) {
-        const browser = await chromium.launch({
+        browser = await chromium.launch({
             headless,
         });
         chromiumContext = await browser.newContext();
@@ -34,7 +36,7 @@ async function getChromiumPage() {
         // browserContext.newPage: Target page, context or browser has been closed
 
         console.error(err);
-        const browser = await chromium.launch({
+        browser = await chromium.launch({
             headless,
         });
         chromiumContext = await browser.newContext();
@@ -48,7 +50,7 @@ async function getJanitorPage() {
         return janitorPage;
     }
 
-    const page = await getChromiumPage();
+    const page = await newChromiumPage();
     await page.goto(`https://janitorai.com`, { waitUntil: 'domcontentloaded' });
     janitorPage = page;
 
@@ -72,7 +74,7 @@ function getImgType(fileName) {
 }
 
 async function getImageBase64(folder, fileName) {
-    const page = await getChromiumPage();
+    const page = await newChromiumPage();
     const imgType = getImgType(fileName);
 
     await page.goto(`https://ella.janitorai.com/${folder}/${fileName}?width=1000`, { waitUntil: 'domcontentloaded' });
@@ -229,11 +231,22 @@ async function getCreatorProfile(id) {
     return rs;
 }
 
+async function cleanup() {
+    console.log('start cleanup chrome')
+    exec('pkill -f chromium');
+    console.log('finish cleanup chrome')
+
+    janitorPage = undefined;
+    chromiumContext = undefined;
+    browser = undefined;
+}
+
 module.exports = {
     getImageBase64,
     getImgType,
     getCharacters,
     getPopularCharacters,
     getCharacter,
-    getCreatorProfile
+    getCreatorProfile,
+    cleanup
 }

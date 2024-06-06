@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { getImageBase64, getImgType, getCharacters, getPopularCharacters, getCreatorProfile, getCharacter } = require('./crawl');
+const { getImageBase64, getImgType, getCharacters, getPopularCharacters, getCreatorProfile, getCharacter, cleanup } = require('./crawl');
 const app = express();
 
 // Enable CORS
@@ -71,6 +71,17 @@ app.get("/popular/characters", async (req, res, next) => {
 
 // Start the Express app
 const port = process.env.PORT || 3000; // Change this to the desired port
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Reverse proxy server is running on port ${port}`);
 });
+
+process.once('SIGINT', () => {
+      console.log('Received SIGINT. Closing server...');
+      
+      cleanup();
+
+      server.close(() => {
+          console.log('Server closed. Exiting process...');
+          process.exit(0);
+      });
+  });

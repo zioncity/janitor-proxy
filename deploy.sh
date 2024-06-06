@@ -7,4 +7,6 @@ rm -rf dist
 
 npm install
 
+# Lol kill all chromium processes of old apps
+pkill -f chromium
 pm2 startOrRestart pm2.json
